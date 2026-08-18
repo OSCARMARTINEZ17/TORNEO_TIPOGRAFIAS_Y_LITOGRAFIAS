@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1er Torneo de Tipografías y Litografías · Fútbol 5</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ===== HEADER ===== -->
+    <header class="site-header" id="top">
+      <div class="header-inner">
+        <a href="#top" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="34" height="34">
+              <circle
+                cx="20"
+                cy="20"
+                r="18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              />
+              <path
+                d="M20 8 L26 13 L23.5 21 L16.5 21 L14 13 Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+          <span class="brand-text">TORNEO<br />GREMIAL</span>
+        </a>
+
+        <nav class="main-nav" id="main-nav">
+          <a href="#torneo">El torneo</a>
+          <a href="#requisitos">Requisitos</a>
+          <a href="#premiacion">Premiación</a>
+          <a href="#organizan">Organizan</a>
+          <a href="#inscripcion" class="nav-cta">Inscribir equipo</a>
+        </nav>
+
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="main-nav"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="torneo">
+      <div class="pitch" aria-hidden="true">
+        <div class="pitch-halfline"></div>
+        <div class="pitch-circle"></div>
+        <div class="pitch-spot"></div>
+        <div class="pitch-arc pitch-arc--left"></div>
+        <div class="pitch-arc pitch-arc--right"></div>
+      </div>
+
+      <div class="hero-content">
+        <p class="eyebrow">
+          Gremio de Tipografías y Litografías · Edición Imprenta y Artes
+          Gráficas 2026
+        </p>
+        <h1 class="hero-title">
+          1ER TORNEO<br /><span>TIPOGRAFÍAS Y LITOGRAFÍAS</span>
+        </h1>
+        <p class="hero-sub">
+          Fútbol 5 en cancha sintética. Categoría libre, máximo 16 equipos. Solo
+          para quienes hoy trabajan en el sector de artes gráficas — el arquero
+          es la única posición abierta a externos.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#inscripcion" class="btn btn--primary"
+            >Inscribir mi equipo</a
+          >
+          <a href="#requisitos" class="btn btn--ghost">Ver requisitos</a>
+        </div>
+      </div>
+
+      <div class="scoreboard" id="scoreboard">
+        <div class="countdown" id="countdown" data-target="2026-08-15T15:00:00">
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-days">00</span>
+            <span class="countdown-label">Días</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-hours">00</span>
+            <span class="countdown-label">Horas</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-mins">00</span>
+            <span class="countdown-label">Min</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-num" id="cd-secs">00</span>
+            <span class="countdown-label">Seg</span>
+          </div>
+        </div>
+        <div class="scoreboard-row scoreboard-row--meta">
+          <span class="scoreboard-status" id="countdown-status">
+            <span class="live-dot" aria-hidden="true"></span> FALTA PARA EL
+            SILBATAZO
+          </span>
+          <span class="scoreboard-label">Sábado 15 de agosto · 3:00 pm</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DATOS RÁPIDOS ===== -->
+    <section class="facts">
+      <div class="facts-grid">
+        <div class="fact">
+          <span class="fact-num">15<span class="fact-unit">ago</span></span>
+          <span class="fact-label">Inicio del<br />torneo</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">14<span class="fact-unit">ago</span></span>
+          <span class="fact-label">Cierre de<br />inscripciones</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">16</span>
+          <span class="fact-label">Cupo máximo<br />de equipos</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">$300K</span>
+          <span class="fact-label">Inscripción<br />por equipo</span>
+        </div>
+        <div class="fact">
+          <span class="fact-num">3–9<span class="fact-unit">pm</span></span>
+          <span class="fact-label">Sábados,<br />horario de juego</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== SOLO DEL GREMIO ===== -->
+    <section class="section section--gremio">
+      <div class="gremio-card">
+        <div class="gremio-icon" aria-hidden="true">🧤</div>
+        <div class="gremio-text">
+          <h2>Solo del gremio de tipografías y litografías</h2>
+          <p>
+            El torneo es exclusivo para personas que actualmente trabajan en el
+            sector de artes gráficas. No se permiten familiares ni personas
+            ajenas al gremio —
+            <strong>la única excepción es el arquero</strong>, que sí puede
+            venir de afuera.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== REQUISITOS ===== -->
+    <section class="section" id="requisitos">
+      <div class="section-head">
+        <h2>Requisitos del torneo</h2>
+        <p>
+          Reglas claras desde ya, para que cada equipo llegue preparado a la
+          primera fecha.
+        </p>
+      </div>
+
+      <ol class="rules-list">
+        <li>
+          <span class="rules-num">1</span>
+          <p>
+            El torneo se realizará únicamente con personas que se encuentren
+            actualmente trabajando en el sector de las artes gráficas. No se
+            permiten familiares ajenos a las artes gráficas.
+          </p>
+        </li>
+        <li>
+          <span class="rules-num">2</span>
+          <p>Cada equipo debe estar completamente uniformado.</p>
+        </li>
+        <li>
+          <span class="rules-num">3</span>
+          <p>
+            El plazo máximo para cancelar una inscripción es hasta la tercera
+            fecha.
+          </p>
+        </li>
+        <li>
+          <span class="rules-num">4</span>
+          <p>No se permite jugar en estado de embriaguez.</p>
+        </li>
+        <li>
+          <span class="rules-num">5</span>
+          <p>
+            El arbitraje se paga en su totalidad el día anterior al partido.
+          </p>
+        </li>
+        <li>
+          <span class="rules-num">6</span>
+          <p>
+            Las reglas serán las mismas desde el principio hasta el final del
+            torneo.
+          </p>
+        </li>
+        <li>
+          <span class="rules-num">7</span>
+          <p>Cada jugador deberá llevar su respectivo carné.</p>
+        </li>
+      </ol>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== PREMIACIÓN ===== -->
+    <section class="section" id="premiacion">
+      <div class="section-head">
+        <h2>Premiación</h2>
+        <p>
+          La premiación total se define según la cantidad de equipos que se
+          inscriban. Se premiará a:
+        </p>
+      </div>
+
+      <div class="awards-grid">
+        <div class="award-card">
+          <span class="award-icon" aria-hidden="true">🏆</span>
+          <span class="award-name">Campeón</span>
+        </div>
+        <div class="award-card">
+          <span class="award-icon" aria-hidden="true">🥈</span>
+          <span class="award-name">Subcampeón</span>
+        </div>
+        <div class="award-card">
+          <span class="award-icon" aria-hidden="true">⚽</span>
+          <span class="award-name">Goleador</span>
+        </div>
+        <div class="award-card">
+          <span class="award-icon" aria-hidden="true">🧤</span>
+          <span class="award-name">Valla menos vencida</span>
+        </div>
+        <div class="award-card">
+          <span class="award-icon" aria-hidden="true">🎖️</span>
+          <span class="award-name">Mejor jugador</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== ORGANIZAN ===== -->
+    <section class="section" id="organizan">
+      <div class="section-head">
+        <h2>Organizan</h2>
+        <p>
+          Escríbeles directamente por WhatsApp para separar tu cupo — quedan
+          pocos.
+        </p>
+      </div>
+
+      <div class="organizers-grid">
+        <a
+          class="organizer-card"
+          href="https://wa.me/573125528528"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="organizer-avatar" aria-hidden="true">OM</span>
+          <span class="organizer-info">
+            <strong>Oscar Martínez</strong>
+            <em>"El Profe"</em>
+            <span class="organizer-phone">312 552 8528</span>
+          </span>
+        </a>
+        <a
+          class="organizer-card"
+          href="https://wa.me/573006286638"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="organizer-avatar" aria-hidden="true">JC</span>
+          <span class="organizer-info">
+            <strong>Juan David Céspedes</strong>
+            <em>"Juanito"</em>
+            <span class="organizer-phone">300 628 6638</span>
+          </span>
+        </a>
+      </div>
+
+      <p class="cupos-nota">
+        📍 El Triangulo · 🎟️ Cupos limitados — busca tus amigos, ven y
+        disfrutemos de un buen torneo.
+      </p>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== INSCRIPCIÓN ===== -->
+    <section class="section section--inscripcion" id="inscripcion">
+      <div class="section-head">
+        <h2>Inscribe tu equipo</h2>
+        <p>
+          Valor de inscripción: <strong>$300.000 por equipo</strong>. Cierre de
+          inscripciones: <strong>14 de agosto</strong>. Recuerda: solo personas
+          del gremio, salvo el arquero.
+        </p>
+      </div>
+
+      <form class="registration-form" id="registration-form" novalidate>
+        <div class="form-row">
+          <label for="team-name">Nombre del equipo</label>
+          <input
+            type="text"
+            id="team-name"
+            name="team-name"
+            required
+            placeholder="Ej. Los Tipógrafos FC"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="captain-name">Nombre del capitán</label>
+          <input
+            type="text"
+            id="captain-name"
+            name="captain-name"
+            required
+            placeholder="Nombre completo"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="empresa">Empresa / taller donde trabaja</label>
+          <input
+            type="text"
+            id="empresa"
+            name="empresa"
+            required
+            placeholder="Ej. Litografía San Marcos"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="phone">WhatsApp de contacto</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            required
+            placeholder="Ej. 300 123 4567"
+          />
+        </div>
+
+        <div class="form-row form-row--full">
+          <label for="notes">Comentarios (opcional)</label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows="3"
+            placeholder="Nombre del arquero externo, dudas sobre el reglamento, etc."
+          ></textarea>
+        </div>
+
+        <div class="form-row form-row--full">
+          <button type="submit" class="btn btn--primary btn--full">
+            Enviar inscripción
+          </button>
+          <p
+            class="form-feedback"
+            id="form-feedback"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="brand-text">TORNEO<br />GREMIAL</span>
+          <p>Fútbol 5 sintética · Cancha por definir</p>
+        </div>
+        <div class="footer-links">
+          <a href="#torneo">El torneo</a>
+          <a href="#requisitos">Requisitos</a>
+          <a href="#premiacion">Premiación</a>
+          <a href="#inscripcion">Inscripción</a>
+        </div>
+        <div class="footer-contact">
+          <a href="https://wa.me/573125528528" target="_blank" rel="noopener"
+            >Óscar "El Profe": 312 552 8528</a
+          >
+          <a href="https://wa.me/573006286638" target="_blank" rel="noopener"
+            >Juanito: 300 628 6638</a
+          >
+        </div>
+      </div>
+      <p class="footer-fine">
+        Edición Imprenta y Artes Gráficas 2026 — cupos limitados, inscripciones
+        hasta el 14 de agosto.
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
