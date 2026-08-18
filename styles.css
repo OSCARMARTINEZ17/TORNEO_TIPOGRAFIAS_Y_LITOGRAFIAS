@@ -491,6 +491,111 @@ h3 {
   background: var(--chalk);
 }
 
+/* ---------- Partidos (fixture) ---------- */
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.match-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 110px;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid rgba(11, 59, 46, 0.1);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+.match-row--proximo {
+  border-style: dashed;
+  border-color: rgba(11, 59, 46, 0.25);
+}
+.match-when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+}
+.match-date {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cancha-dark);
+  text-transform: capitalize;
+}
+.match-hour {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.match-jornada {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14.5px;
+  text-align: right;
+}
+.match-team {
+  flex: 1;
+}
+.match-team--local {
+  text-align: right;
+}
+.match-team--visitante {
+  text-align: left;
+}
+.match-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--cancha-dark);
+  background: rgba(11, 59, 46, 0.06);
+  padding: 4px 12px;
+  border-radius: 6px;
+  min-width: 54px;
+  text-align: center;
+}
+.match-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  justify-self: end;
+}
+.match-status--jugado {
+  background: rgba(11, 59, 46, 0.08);
+  color: var(--cancha-dark);
+}
+.match-status--proximo {
+  background: rgba(245, 197, 24, 0.22);
+  color: #7a5b00;
+}
+@media (max-width: 700px) {
+  .match-row {
+    grid-template-columns: 1fr;
+    text-align: left;
+    gap: 8px;
+  }
+  .match-teams {
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .match-team--local,
+  .match-team--visitante {
+    text-align: left;
+  }
+  .match-status {
+    justify-self: start;
+  }
+}
+
 /* ---------- Tabla de posiciones ---------- */
 .table-wrap {
   overflow-x: auto;
@@ -723,69 +828,6 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
-
-/* ---------- Inscripción ---------- */
-.section--inscripcion {
-  background: rgba(11, 59, 46, 0.04);
-  border-radius: 20px;
-}
-.registration-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 20px;
-  max-width: 720px;
-}
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.form-row--full {
-  grid-column: 1 / -1;
-}
-.form-row label {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--cancha-dark);
-}
-.form-row input,
-.form-row select,
-.form-row textarea {
-  border: 1.5px solid rgba(11, 59, 46, 0.22);
-  border-radius: 8px;
-  padding: 11px 12px;
-  font-family: var(--font-body);
-  font-size: 14.5px;
-  background: #fff;
-  color: var(--ink);
-}
-.form-row input:focus,
-.form-row select:focus,
-.form-row textarea:focus {
-  border-color: var(--cancha-dark);
-}
-.form-row input:invalid:not(:placeholder-shown) {
-  border-color: var(--card-red);
-}
-.form-feedback {
-  margin: 12px 0 0;
-  font-size: 14px;
-  font-weight: 600;
-  min-height: 20px;
-}
-.form-feedback.is-success {
-  color: var(--cancha-dark);
-}
-.form-feedback.is-error {
-  color: var(--card-red);
-}
-
-@media (max-width: 640px) {
-  .registration-form {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ---------- Patrocinadores ---------- */
 .sponsors {
   padding: 32px 24px 8px;

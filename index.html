@@ -38,11 +38,11 @@
 
         <nav class="main-nav" id="main-nav">
           <a href="#torneo">El torneo</a>
+          <a href="#partidos">Partidos</a>
           <a href="#posiciones">Posiciones</a>
           <a href="#requisitos">Requisitos</a>
           <a href="#premiacion">Premiación</a>
-          <a href="#organizan">Organizan</a>
-          <a href="#inscripcion" class="nav-cta">Inscribir equipo</a>
+          <a href="#organizan" class="nav-cta">Organizan</a>
         </nav>
 
         <button
@@ -82,10 +82,8 @@
         </p>
 
         <div class="hero-actions">
-          <a href="#inscripcion" class="btn btn--primary"
-            >Inscribir mi equipo</a
-          >
-          <a href="#requisitos" class="btn btn--ghost">Ver requisitos</a>
+          <a href="#partidos" class="btn btn--primary">Ver calendario</a>
+          <a href="#posiciones" class="btn btn--ghost">Ver posiciones</a>
         </div>
       </div>
 
@@ -142,6 +140,25 @@
           <span class="fact-label">Sábados,<br />horario de juego</span>
         </div>
       </div>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== PARTIDOS (en vivo desde Google Sheets) ===== -->
+    <section class="section" id="partidos">
+      <div class="section-head">
+        <h2>Partidos</h2>
+        <p>
+          Resultados jugados y próximas fechas, con día y hora. Se actualiza
+          sola desde la hoja "Partidos" del torneo.
+        </p>
+      </div>
+
+      <div class="match-list" id="match-list">
+        <p class="standings-loading">Cargando partidos…</p>
+      </div>
+
+      <p class="standings-meta" id="matches-meta"></p>
     </section>
 
     <div class="halfline-divider" aria-hidden="true"><span></span></div>
@@ -343,88 +360,6 @@
       </p>
     </section>
 
-    <div class="halfline-divider" aria-hidden="true"><span></span></div>
-
-    <!-- ===== INSCRIPCIÓN ===== -->
-    <section class="section section--inscripcion" id="inscripcion">
-      <div class="section-head">
-        <h2>Inscribe tu equipo</h2>
-        <p>
-          Valor de inscripción: <strong>$300.000 por equipo</strong>. Cierre de
-          inscripciones: <strong>14 de agosto</strong>. Recuerda: solo personas
-          del gremio, salvo el arquero.
-        </p>
-      </div>
-
-      <form class="registration-form" id="registration-form" novalidate>
-        <div class="form-row">
-          <label for="team-name">Nombre del equipo</label>
-          <input
-            type="text"
-            id="team-name"
-            name="team-name"
-            required
-            placeholder="Ej. Los Tipógrafos FC"
-          />
-        </div>
-
-        <div class="form-row">
-          <label for="captain-name">Nombre del capitán</label>
-          <input
-            type="text"
-            id="captain-name"
-            name="captain-name"
-            required
-            placeholder="Nombre completo"
-          />
-        </div>
-
-        <div class="form-row">
-          <label for="empresa">Empresa / taller donde trabaja</label>
-          <input
-            type="text"
-            id="empresa"
-            name="empresa"
-            required
-            placeholder="Ej. Litografía San Marcos"
-          />
-        </div>
-
-        <div class="form-row">
-          <label for="phone">WhatsApp de contacto</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            required
-            placeholder="Ej. 300 123 4567"
-          />
-        </div>
-
-        <div class="form-row form-row--full">
-          <label for="notes">Comentarios (opcional)</label>
-          <textarea
-            id="notes"
-            name="notes"
-            rows="3"
-            placeholder="Nombre del arquero externo, dudas sobre el reglamento, etc."
-          ></textarea>
-        </div>
-
-        <div class="form-row form-row--full">
-          <button type="submit" class="btn btn--primary btn--full">
-            Enviar inscripción
-          </button>
-          <p
-            class="form-feedback"
-            id="form-feedback"
-            role="status"
-            aria-live="polite"
-          ></p>
-        </div>
-      </form>
-    </section>
-
     <!-- ===== FOOTER ===== -->
     <footer class="site-footer">
       <div class="footer-inner">
@@ -434,9 +369,9 @@
         </div>
         <div class="footer-links">
           <a href="#torneo">El torneo</a>
+          <a href="#partidos">Partidos</a>
+          <a href="#posiciones">Posiciones</a>
           <a href="#requisitos">Requisitos</a>
-          <a href="#premiacion">Premiación</a>
-          <a href="#inscripcion">Inscripción</a>
         </div>
         <div class="footer-contact">
           <a href="https://wa.me/573125528528" target="_blank" rel="noopener"
