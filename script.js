@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ---------- Tabla de posiciones en vivo (Google Sheets) ---------- */
 // URL del rango ya ordenado (hoja "Posiciones", columnas N:W) de tu Google Sheet.
 // Si cambias de spreadsheet o mueves la tabla de columna, actualiza esta URL.
-const SHEET_ID = "15cH7eF6NAZoatQwod_QpGWmsqFiJOegK";
+const SHEET_ID = "16SPJe7pkLcJurVrMVFH2VMsg0gAscddnH8CGonias_g";
 const STANDINGS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Posiciones&range=N1:W18`;
 
 function initStandings() {
