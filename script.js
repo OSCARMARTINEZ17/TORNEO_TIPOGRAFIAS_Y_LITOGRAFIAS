@@ -8,7 +8,101 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileNav();
   initCountdown();
   initRegistrationForm();
+  initStandings();
 });
+
+/* ---------- Tabla de posiciones en vivo (Google Sheets) ---------- */
+// URL del rango ya ordenado (hoja "Posiciones", columnas N:W) de tu Google Sheet.
+// Si cambias de spreadsheet o mueves la tabla de columna, actualiza esta URL.
+const SHEET_ID = '15cH7eF6NAZoatQwod_QpGWmsqFiJOegK';
+const STANDINGS_CSV_URL =
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Posiciones&range=N1:W18`;
+
+function initStandings() {
+  const body = document.getElementById('standings-body');
+  const meta = document.getElementById('standings-meta');
+  if (!body) return;
+
+  loadStandings(body, meta);
+  // Refresca sola cada 2 minutos mientras la página quede abierta.
+  setInterval(() => loadStandings(body, meta), 2 * 60 * 1000);
+}
+
+async function loadStandings(body, meta) {
+  try {
+    const response = await fetch(STANDINGS_CSV_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error('No se pudo leer la hoja de cálculo.');
+
+    const csvText = await response.text();
+    const rows = parseCsv(csvText).filter((row) => row.some((cell) => cell.trim() !== ''));
+
+    // La primera fila es el encabezado (Pos, Equipo, PJ...); la ignoramos.
+    const dataRows = rows.slice(1);
+
+    if (dataRows.length === 0) {
+      body.innerHTML = '<tr><td colspan="10" class="standings-loading">Todavía no hay partidos registrados.</td></tr>';
+    } else {
+      body.innerHTML = dataRows.map(rowToHtml).join('');
+    }
+
+    if (meta) {
+      const now = new Date();
+      meta.textContent = `Última actualización: ${now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+  } catch (err) {
+    body.innerHTML = '<tr><td colspan="10" class="standings-error">No se pudo cargar la tabla. Revisa que la hoja de Google Sheets esté compartida como público.</td></tr>';
+  }
+}
+
+function rowToHtml(row) {
+  const [pos, equipo, pj, pg, pe, pp, gf, gc, dg, pts] = row;
+  return `
+    <tr>
+      <td class="al">${pos}</td>
+      <td class="al">${equipo}</td>
+      <td>${pj}</td>
+      <td>${pg}</td>
+      <td>${pe}</td>
+      <td>${pp}</td>
+      <td>${gf}</td>
+      <td>${gc}</td>
+      <td>${dg}</td>
+      <td class="pts">${pts}</td>
+    </tr>`;
+}
+
+// Parser de CSV sencillo: soporta campos entre comillas (Google los usa si
+// un valor trae comas). Suficiente para una tabla como esta, sin depender
+// de ninguna librería externa.
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (inQuotes) {
+      if (char === '"' && next === '"') { field += '"'; i++; }
+      else if (char === '"') { inQuotes = false; }
+      else { field += char; }
+    } else if (char === '"') {
+      inQuotes = true;
+    } else if (char === ',') {
+      row.push(field); field = '';
+    } else if (char === '\n' || char === '\r') {
+      if (char === '\r' && next === '\n') i++;
+      row.push(field); field = '';
+      rows.push(row); row = [];
+    } else {
+      field += char;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
 
 /* ---------- Menú móvil ---------- */
 function initMobileNav() {

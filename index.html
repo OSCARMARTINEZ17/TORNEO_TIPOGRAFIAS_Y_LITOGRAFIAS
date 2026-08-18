@@ -38,6 +38,7 @@
 
         <nav class="main-nav" id="main-nav">
           <a href="#torneo">El torneo</a>
+          <a href="#posiciones">Posiciones</a>
           <a href="#requisitos">Requisitos</a>
           <a href="#premiacion">Premiación</a>
           <a href="#organizan">Organizan</a>
@@ -141,6 +142,47 @@
           <span class="fact-label">Sábados,<br />horario de juego</span>
         </div>
       </div>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== POSICIONES (en vivo desde Google Sheets) ===== -->
+    <section class="section" id="posiciones">
+      <div class="section-head">
+        <h2>Tabla de posiciones</h2>
+        <p>
+          Se actualiza sola cada vez que se carga un partido en la hoja de
+          cálculo del torneo.
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="standings" id="standings-table">
+          <thead>
+            <tr>
+              <th class="al">#</th>
+              <th class="al">Equipo</th>
+              <th>PJ</th>
+              <th>PG</th>
+              <th>PE</th>
+              <th>PP</th>
+              <th>GF</th>
+              <th>GC</th>
+              <th>DG</th>
+              <th>PTS</th>
+            </tr>
+          </thead>
+          <tbody id="standings-body">
+            <tr>
+              <td colspan="10" class="standings-loading">
+                Cargando posiciones…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="standings-meta" id="standings-meta"></p>
     </section>
 
     <div class="halfline-divider" aria-hidden="true"><span></span></div>
@@ -275,7 +317,7 @@
         >
           <span class="organizer-avatar" aria-hidden="true">OM</span>
           <span class="organizer-info">
-            <strong>Oscar Martínez</strong>
+            <strong>Óscar Martínez</strong>
             <em>"El Profe"</em>
             <span class="organizer-phone">312 552 8528</span>
           </span>
@@ -296,7 +338,7 @@
       </div>
 
       <p class="cupos-nota">
-        📍 El Triangulo · 🎟️ Cupos limitados — busca tus amigos, ven y
+        📍 Cancha por definir · 🎟️ Cupos limitados — busca tus amigos, ven y
         disfrutemos de un buen torneo.
       </p>
     </section>
@@ -398,7 +440,7 @@
         </div>
         <div class="footer-contact">
           <a href="https://wa.me/573125528528" target="_blank" rel="noopener"
-            >Óscar "El Profe": 312 552 8528</a
+            >Oscar "El Profe": 312 552 8528</a
           >
           <a href="https://wa.me/573006286638" target="_blank" rel="noopener"
             >Juanito: 300 628 6638</a
