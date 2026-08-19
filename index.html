@@ -39,8 +39,9 @@
         <nav class="main-nav" id="main-nav">
           <a href="#torneo">El torneo</a>
           <a href="#partidos">Partidos</a>
+          <a href="#equipos">Equipos</a>
           <a href="#posiciones">Posiciones</a>
-          <a href="#requisitos">Requisitos</a>
+          <a href="#reglamento">Reglamento</a>
           <a href="#premiacion">Premiación</a>
           <a href="#organizan" class="nav-cta">Organizan</a>
         </nav>
@@ -128,7 +129,7 @@
           <span class="fact-label">Cierre de<br />inscripciones</span>
         </div>
         <div class="fact">
-          <span class="fact-num">16</span>
+          <span class="fact-num">10</span>
           <span class="fact-label">Cupo máximo<br />de equipos</span>
         </div>
         <div class="fact">
@@ -149,16 +150,59 @@
       <div class="section-head">
         <h2>Partidos</h2>
         <p>
-          Resultados jugados y próximas fechas, con día y hora. Se actualiza
+          Próximas fechas y resultados jugados, con día y hora. Se actualiza
           sola desde la hoja "Partidos" del torneo.
         </p>
       </div>
 
-      <div class="match-list" id="match-list">
+      <div class="matches-tabs" role="tablist">
+        <button
+          class="matches-tab is-active"
+          type="button"
+          data-tab="proximos"
+          role="tab"
+          aria-selected="true"
+        >
+          Próximos
+        </button>
+        <button
+          class="matches-tab"
+          type="button"
+          data-tab="jugados"
+          role="tab"
+          aria-selected="false"
+        >
+          Jugados
+        </button>
+      </div>
+
+      <div class="match-panel is-active" id="match-list-proximos" role="tabpanel">
+        <p class="standings-loading">Cargando partidos…</p>
+      </div>
+      <div class="match-panel" id="match-list-jugados" role="tabpanel">
         <p class="standings-loading">Cargando partidos…</p>
       </div>
 
       <p class="standings-meta" id="matches-meta"></p>
+    </section>
+
+    <div class="halfline-divider" aria-hidden="true"><span></span></div>
+
+    <!-- ===== EQUIPOS (en vivo desde Google Sheets) ===== -->
+    <section class="section" id="equipos">
+      <div class="section-head">
+        <h2>Equipos</h2>
+        <p>
+          Escudo, nombre y plantilla de cada equipo inscrito. Toca un equipo
+          para ver a sus jugadores.
+        </p>
+      </div>
+
+      <div class="teams-grid" id="teams-grid">
+        <p class="standings-loading">Cargando equipos…</p>
+      </div>
+
+      <p class="standings-meta" id="teams-meta"></p>
     </section>
 
     <div class="halfline-divider" aria-hidden="true"><span></span></div>
@@ -223,10 +267,10 @@
 
     <div class="halfline-divider" aria-hidden="true"><span></span></div>
 
-    <!-- ===== REQUISITOS ===== -->
-    <section class="section" id="requisitos">
+    <!-- ===== REGLAMENTO ===== -->
+    <section class="section" id="reglamento">
       <div class="section-head">
-        <h2>Requisitos del torneo</h2>
+        <h2>Reglamento del torneo</h2>
         <p>
           Reglas claras desde ya, para que cada equipo llegue preparado a la
           primera fecha.
@@ -370,8 +414,9 @@
         <div class="footer-links">
           <a href="#torneo">El torneo</a>
           <a href="#partidos">Partidos</a>
+          <a href="#equipos">Equipos</a>
           <a href="#posiciones">Posiciones</a>
-          <a href="#requisitos">Requisitos</a>
+          <a href="#reglamento">Reglamento</a>
         </div>
         <div class="footer-contact">
           <a href="https://wa.me/573125528528" target="_blank" rel="noopener"
@@ -390,4 +435,4 @@
 
     <script src="script.js"></script>
   </body>
-</html> 
+</html>

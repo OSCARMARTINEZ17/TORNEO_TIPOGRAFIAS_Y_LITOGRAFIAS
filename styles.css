@@ -491,6 +491,50 @@ h3 {
   background: var(--chalk);
 }
 
+/* ---------- Partidos: pestañas Próximos / Jugados ---------- */
+.matches-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.matches-tab {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(18, 35, 63, 0.15);
+  background: #fff;
+  color: var(--ink-soft);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.matches-tab.is-active {
+  background: var(--cancha-dark);
+  border-color: var(--cancha-dark);
+  color: var(--chalk);
+}
+.match-panel {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+.match-panel.is-active {
+  display: flex;
+}
+.match-tentativa {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--card-red);
+  opacity: 0.8;
+}
+
 /* ---------- Partidos (fixture) ---------- */
 .match-list {
   display: flex;
@@ -596,6 +640,103 @@ h3 {
   }
 }
 
+/* ---------- Equipos ---------- */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+.team-card {
+  background: #fff;
+  border: 1px solid rgba(18, 35, 63, 0.1);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.team-card-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: none;
+  border: none;
+}
+.team-crest {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--chalk);
+}
+.team-crest--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+}
+.team-name {
+  flex: 1;
+  text-align: left;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--cancha-dark);
+}
+.team-toggle-icon {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.team-card.is-open .team-toggle-icon {
+  transform: rotate(45deg);
+}
+.player-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0 18px 18px;
+  display: none;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 14px 10px;
+  border-top: 1px solid rgba(18, 35, 63, 0.08);
+}
+.team-card.is-open .player-grid {
+  display: grid;
+  padding-top: 16px;
+}
+.player-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.player-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--chalk);
+}
+.player-photo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.player-name {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  line-height: 1.2;
+}
+.player-card--empty {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: left;
+}
+
 /* ---------- Tabla de posiciones ---------- */
 .table-wrap {
   overflow-x: auto;
@@ -696,7 +837,7 @@ h3 {
   color: var(--floodlight);
 }
 
-/* ---------- Requisitos ---------- */
+/* ---------- Reglamento ---------- */
 .rules-list {
   list-style: none;
   margin: 0;
