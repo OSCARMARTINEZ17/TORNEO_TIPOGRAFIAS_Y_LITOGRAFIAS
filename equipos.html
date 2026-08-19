@@ -1,0 +1,26 @@
+<!--
+  Plantilla de la tarjeta de un equipo y de un jugador.
+  script.js trae este archivo con fetch('equipos.html'), toma los dos
+  <template> de aquí abajo y los repite una vez por cada fila que llega
+  de la hoja de cálculo, reemplazando cada {{TOKEN}} por el dato real.
+  Un <template> es HTML estándar: el navegador no lo dibuja hasta que
+  el JS lo pide, así que este archivo no necesita nada especial para
+  abrirse en cualquier navegador.
+-->
+<template id="team-card-template">
+  <article class="team-card">
+    <button class="team-card-head" type="button" aria-expanded="false">
+      {{ESCUDO}}
+      <span class="team-name">{{NOMBRE}}</span>
+      <span class="team-toggle-icon" aria-hidden="true">+</span>
+    </button>
+    <ul class="player-grid">{{JUGADORES}}</ul>
+  </article>
+</template>
+
+<template id="player-card-template">
+  <li class="player-card">
+    {{FOTO}}
+    <span class="player-name">{{NOMBRE}}</span>
+  </li>
+</template>

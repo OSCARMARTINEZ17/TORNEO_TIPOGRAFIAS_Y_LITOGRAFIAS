@@ -1,0 +1,23 @@
+<!--
+  Plantilla de una fila de "próximo partido".
+  script.js trae este archivo con fetch('partidos_proximos.html') y
+  repite este <template> una vez por cada partido pendiente, incluida
+  la fecha generada automáticamente cuando no hay fechas cargadas en
+  la hoja "Partidos".
+-->
+<template id="proximo-row-template">
+  <div class="match-row match-row--proximo">
+    <div class="match-when">
+      <span class="match-date">{{FECHA}}</span>
+      {{HORA}}
+      <span class="match-jornada">Jornada {{JORNADA}}</span>
+      {{TENTATIVA}}
+    </div>
+    <div class="match-teams">
+      <span class="match-team match-team--local">{{LOCAL}}</span>
+      <span class="match-score">vs</span>
+      <span class="match-team match-team--visitante">{{VISITANTE}}</span>
+    </div>
+    <span class="match-status match-status--proximo">Próximo</span>
+  </div>
+</template>

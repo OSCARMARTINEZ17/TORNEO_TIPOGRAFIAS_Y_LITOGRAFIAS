@@ -1,0 +1,21 @@
+<!--
+  Plantilla de una fila de "partido jugado".
+  script.js trae este archivo con fetch('partidos_jugados.html') y
+  repite este <template> una vez por cada partido que ya tiene marcador
+  cargado en la hoja "Partidos".
+-->
+<template id="jugado-row-template">
+  <div class="match-row">
+    <div class="match-when">
+      <span class="match-date">{{FECHA}}</span>
+      {{HORA}}
+      <span class="match-jornada">Jornada {{JORNADA}}</span>
+    </div>
+    <div class="match-teams">
+      <span class="match-team match-team--local">{{LOCAL}}</span>
+      <span class="match-score">{{GOLES_LOCAL}} – {{GOLES_VISITANTE}}</span>
+      <span class="match-team match-team--visitante">{{VISITANTE}}</span>
+    </div>
+    <span class="match-status match-status--jugado">Jugado</span>
+  </div>
+</template>
