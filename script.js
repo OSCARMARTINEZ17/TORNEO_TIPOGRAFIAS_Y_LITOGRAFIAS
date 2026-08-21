@@ -378,6 +378,10 @@ function initMatchTabs() {
     proximos: document.getElementById("match-list-proximos"),
     jugados: document.getElementById("match-list-jugados"),
   };
+  const filtros = {
+    proximos: document.getElementById("matches-filter-proximos"),
+    jugados: document.getElementById("matches-filter-jugados"),
+  };
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       tabs.forEach((t) => {
@@ -389,6 +393,10 @@ function initMatchTabs() {
       const target = tab.dataset.tab;
       Object.entries(panels).forEach(([key, panel]) => {
         if (panel) panel.classList.toggle("is-active", key === target);
+      });
+      // Cada pestaña muestra solo su propio filtro de fecha.
+      Object.entries(filtros).forEach(([key, filtro]) => {
+        if (filtro) filtro.classList.toggle("is-hidden", key !== target);
       });
     });
   });
@@ -404,11 +412,83 @@ function initMatches(teamNames, proximoTemplate, jugadoTemplate) {
   const meta = document.getElementById("matches-meta");
   if (!proximosList && !jugadosList) return;
 
-  loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate);
-  setInterval(
-    () => loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate),
-    2 * 60 * 1000,
-  );
+  const recargar = () =>
+    loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate);
+
+  initCompletarBoton();
+  initFiltroFecha("filtro-fecha-proximos", () => renderProximos(proximosList, proximoTemplate));
+  initFiltroFecha("filtro-fecha-jugados", () => renderJugados(jugadosList, jugadoTemplate));
+  document.addEventListener("torneo:recargar-partidos", recargar);
+
+  recargar();
+  setInterval(recargar, 2 * 60 * 1000);
+}
+
+// Guardamos la última lista completa de "próximos" y "jugados" para poder
+// volver a pintarlas filtradas sin pedir de nuevo las hojas de cálculo
+// cada vez que cambia un filtro.
+let ultimosProximos = [];
+let ultimosJugados = [];
+
+function initFiltroFecha(selectId, onChange) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.addEventListener("change", onChange);
+}
+
+// Rellena un <select> con las "Fecha N" (número de jornada) que
+// realmente existen en "rows" (cada row trae ese número en la posición
+// 1), ordenadas de menor a mayor, y respeta la que el usuario ya tenía
+// elegida si sigue existiendo.
+function poblarFiltroFecha(selectId, rows) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+
+  const numeros = [...new Set(
+    rows.map((row) => (row[1] || "").trim()).filter(Boolean),
+  )].sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+
+  const valorPrevio = select.value || "todas";
+
+  select.innerHTML =
+    '<option value="todas">Todas las fechas</option>' +
+    numeros.map((n) => `<option value="${n}">Fecha ${n}</option>`).join("");
+
+  select.value = numeros.includes(valorPrevio) ? valorPrevio : "todas";
+}
+
+// Pinta el panel de "próximos" según la Fecha (jornada) elegida en el filtro.
+function renderProximos(proximosList, proximoTemplate) {
+  if (!proximosList) return;
+
+  const select = document.getElementById("filtro-fecha-proximos");
+  const filtro = select ? select.value : "todas";
+
+  const filtrados =
+    filtro === "todas"
+      ? ultimosProximos
+      : ultimosProximos.filter(({ row }) => (row[1] || "").trim() === filtro);
+
+  proximosList.innerHTML = filtrados.length
+    ? filtrados.map(({ row, auto }) => matchProximoToHtml(row, auto, proximoTemplate)).join("")
+    : '<p class="standings-loading">No hay partidos próximos en esa fecha.</p>';
+}
+
+// Pinta el panel de "jugados" según la Fecha (jornada) elegida en el filtro.
+function renderJugados(jugadosList, jugadoTemplate) {
+  if (!jugadosList) return;
+
+  const select = document.getElementById("filtro-fecha-jugados");
+  const filtro = select ? select.value : "todas";
+
+  const filtrados =
+    filtro === "todas"
+      ? ultimosJugados
+      : ultimosJugados.filter((row) => (row[1] || "").trim() === filtro);
+
+  jugadosList.innerHTML = filtrados.length
+    ? filtrados.map((row) => matchJugadoToHtml(row, jugadoTemplate)).join("")
+    : '<p class="standings-loading">No hay partidos jugados en esa fecha.</p>';
 }
 
 async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate) {
@@ -428,47 +508,158 @@ async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTe
       .filter((row) => row[0] && row[0].trim() !== "");
 
     const proximosCsv = await proximosRes.text();
-    let proximosRows = parseCsv(proximosCsv)
+    const proximosRows = parseCsv(proximosCsv)
       .filter((row) => row.some((cell) => cell.trim() !== ""))
       .slice(1) // encabezado
       .filter((row) => row[0] && row[0].trim() !== "");
 
-    let autoGenerado = false;
+    // Completamos automáticamente SOLO los enfrentamientos que todavía no
+    // existen (ni como partido jugado, ni como fila manual en
+    // "PartidosProximos"). Así conservamos tal cual lo que cargaste a mano
+    // y el sitio arma solo el resto del "todos contra todos", continuando
+    // la numeración de jornada y las fechas después de tu último partido.
+    let autoRows = [];
+    if (teamNames && teamNames.length >= 2) {
+      const existingPairs = new Set([
+        ...jugadosRows.map((row) => pairKey(row[2], row[4])),
+        ...proximosRows.map((row) => pairKey(row[2], row[3])),
+      ]);
 
-    // Si la hoja "PartidosProximos" todavía está vacía, generamos un
-    // fixture "todos contra todos" a partir de los equipos inscritos,
-    // con fecha y hora, arrancando el próximo sábado. Son fechas
-    // tentativas hasta que las confirmes en la hoja de cálculo.
-    if (proximosRows.length === 0 && teamNames && teamNames.length >= 2) {
-      proximosRows = generateRoundRobin(teamNames, nextSaturday());
-      autoGenerado = true;
+      const maxJornada = Math.max(
+        0,
+        ...jugadosRows.map((row) => parseInt(row[1], 10) || 0),
+        ...proximosRows.map((row) => parseInt(row[1], 10) || 0),
+      );
+
+      const lastDate = latestDate([...jugadosRows, ...proximosRows], 0);
+      let startDateISO;
+      if (lastDate) {
+        const d = new Date(lastDate);
+        d.setDate(d.getDate() + 7); // arrancamos una semana después del último partido conocido
+        while (d.getDay() !== 6) d.setDate(d.getDate() + 1); // siguiente sábado
+        startDateISO = d.toISOString().slice(0, 10);
+      } else {
+        startDateISO = nextSaturday();
+      }
+
+      autoRows = generateMissingFixture(teamNames, existingPairs, startDateISO, maxJornada);
     }
 
+    const combinedProximos = [
+      ...proximosRows.map((row) => ({ row, auto: false })),
+      ...autoRows.map((row) => ({ row, auto: true })),
+    ];
+
+    ultimosJugados = jugadosRows;
+    poblarFiltroFecha("filtro-fecha-jugados", jugadosRows);
     if (jugadosList) {
-      jugadosList.innerHTML = jugadosRows.length
-        ? jugadosRows.map((row) => matchJugadoToHtml(row, jugadoTemplate)).join("")
-        : '<p class="standings-loading">Todavía no se ha jugado ningún partido.</p>';
+      if (jugadosRows.length) {
+        renderJugados(jugadosList, jugadoTemplate);
+      } else {
+        jugadosList.innerHTML = '<p class="standings-loading">Todavía no se ha jugado ningún partido.</p>';
+      }
     }
+    ultimosProximos = combinedProximos;
+    poblarFiltroFecha("filtro-fecha-proximos", combinedProximos.map(({ row }) => row));
     if (proximosList) {
-      proximosList.innerHTML = proximosRows.length
-        ? proximosRows.map((row) => matchProximoToHtml(row, autoGenerado, proximoTemplate)).join("")
-        : '<p class="standings-loading">Todavía no hay partidos programados.</p>';
+      if (combinedProximos.length) {
+        renderProximos(proximosList, proximoTemplate);
+      } else {
+        proximosList.innerHTML = '<p class="standings-loading">Todavía no hay partidos programados.</p>';
+      }
     }
 
     if (meta) {
       const now = new Date();
-      const nota = autoGenerado
-        ? " · Próximas fechas tentativas, generadas automáticamente a partir de los equipos inscritos"
+      const nota = autoRows.length
+        ? ` · Se completaron ${autoRows.length} partido${autoRows.length === 1 ? "" : "s"} automáticamente a partir de los equipos inscritos`
         : "";
       meta.textContent = `Última actualización: ${now.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}${nota}`;
     }
+
+    ultimosFaltantes = autoRows;
+    actualizarBotonCompletar();
   } catch (err) {
     console.error(err);
     const msg =
       '<p class="standings-error">No se pudo cargar el calendario. Revisa que las hojas "PartidosJugados" y "PartidosProximos" existan y que el spreadsheet esté compartido como público.</p>';
     if (jugadosList) jugadosList.innerHTML = msg;
     if (proximosList) proximosList.innerHTML = msg;
+    ultimosFaltantes = [];
+    actualizarBotonCompletar();
   }
+}
+
+/* ---------- Guardar en la hoja los partidos que faltan por completar ----------
+   El sitio (estático) NO puede escribir directamente en Google Sheets, así
+   que este botón manda los partidos faltantes a un pequeño Web App de
+   Google Apps Script (código en el archivo apps-script-completar.gs) que
+   sí tiene permiso para agregar filas a "PartidosProximos". El propio
+   Apps Script vuelve a revisar duplicados antes de guardar, así que apretar
+   el botón varias veces es seguro. */
+const COMPLETAR_WEBAPP_URL =
+  "https://script.google.com/macros/s/AKfycbxU_8_rP-7AChqHFLAvtCRZLfPlJg_vamq9EIHZhcr87poMa9lBUrnIPI8N27_75uDCDw/exec";
+
+let ultimosFaltantes = [];
+
+function actualizarBotonCompletar() {
+  const btn = document.getElementById("btn-completar-sheet");
+  const status = document.getElementById("completar-status");
+  if (!btn) return;
+
+  if (ultimosFaltantes.length === 0) {
+    btn.hidden = true;
+    if (status) status.textContent = "";
+    return;
+  }
+
+  btn.hidden = false;
+  btn.disabled = false;
+  btn.textContent = `Guardar ${ultimosFaltantes.length} partido${ultimosFaltantes.length === 1 ? "" : "s"} faltante${ultimosFaltantes.length === 1 ? "" : "s"} en la hoja`;
+}
+
+function initCompletarBoton() {
+  const btn = document.getElementById("btn-completar-sheet");
+  const status = document.getElementById("completar-status");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    if (ultimosFaltantes.length === 0) return;
+
+    if (COMPLETAR_WEBAPP_URL.includes("PEGA_AQUI")) {
+      if (status) {
+        status.textContent =
+          "Falta configurar la URL del Apps Script en script.js (constante COMPLETAR_WEBAPP_URL).";
+      }
+      return;
+    }
+
+    btn.disabled = true;
+    if (status) status.textContent = "Guardando…";
+
+    try {
+      const response = await fetch(COMPLETAR_WEBAPP_URL, {
+        method: "POST",
+        // text/plain evita el preflight CORS que Apps Script no maneja por defecto.
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ rows: ultimosFaltantes }),
+      });
+      const data = await response.json();
+      if (!data.ok) throw new Error(data.error || "Error desconocido");
+
+      if (status) {
+        status.textContent = `Listo: se guardaron ${data.agregadas} partido${data.agregadas === 1 ? "" : "s"} en la hoja.`;
+      }
+      // Recargamos el calendario para reflejar lo que ya quedó guardado.
+      document.dispatchEvent(new Event("torneo:recargar-partidos"));
+    } catch (err) {
+      console.error(err);
+      if (status) {
+        status.textContent = "No se pudo guardar en la hoja. Revisa la consola para más detalle.";
+      }
+      btn.disabled = false;
+    }
+  });
 }
 
 // Fila de "PartidosJugados": Fecha | Jornada | Local | Goles Local |
@@ -551,6 +742,113 @@ function generateRoundRobin(teamNames, startDateISO) {
   }
 
   return schedule;
+}
+
+// Clave sin orden para identificar un enfrentamiento sin importar quién
+// juega de local o visitante ("ADH vs LEONARD" = "LEONARD vs ADH").
+function pairKey(a, b) {
+  return [a, b]
+    .map((s) => (s || "").trim().toLowerCase())
+    .sort()
+    .join("||");
+}
+
+// Fecha más reciente entre un grupo de filas (jugados + próximos manuales),
+// para saber a partir de cuándo seguir armando el calendario automático.
+function latestDate(rows, dateIndex) {
+  let max = null;
+  rows.forEach((row) => {
+    const d = new Date(`${(row[dateIndex] || "").trim()}T00:00:00`);
+    if (!isNaN(d.getTime()) && (!max || d > max)) max = d;
+  });
+  return max;
+}
+
+// Arma el "todos contra todos" completo (con los equipos ACTUALES) y se
+// queda solo con los enfrentamientos que faltan (los que no están ni
+// jugados ni cargados a mano en "PartidosProximos"), reempaquetándolos en
+// fechas nuevas que continúan después de tu última fecha registrada.
+//
+// OJO: no heredamos la ronda "original" del fixture completo, porque si
+// alguno de sus cruces ya estaba jugado o cargado a mano bajo otra fecha,
+// esa fecha se quedaba con menos partidos de los que le caben. Tampoco
+// alcanza con repartir los partidos en el orden en que salen del fixture:
+// cuando un equipo se inscribe DESPUÉS de arrancado el torneo, le quedan
+// pendientes muchos más cruces que a los demás (tiene que jugar contra
+// todos), así que si no se le da prioridad, sus partidos quedan sueltos
+// en varias fechas a medias en vez de agruparse bien.
+//
+// Por eso, en cada fecha nueva armamos primero los partidos de los
+// equipos con MÁS cruces pendientes (los recién inscritos, típicamente),
+// y solo después llenamos los espacios que sobren con el resto. Esto es
+// una heurística "voraz" (greedy) — no siempre logra el máximo teórico
+// de partidos por fecha, pero se acerca bastante más que repartir en el
+// orden en que salen.
+function generateMissingFixture(teamNames, existingPairs, startDateISO, jornadaOffset) {
+  const fullSchedule = generateRoundRobin(teamNames, startDateISO);
+
+  // Grafo de partidos que faltan: equipo -> Set de rivales pendientes.
+  const pendientes = new Map();
+  const agregarPendiente = (a, b) => {
+    if (!pendientes.has(a)) pendientes.set(a, new Set());
+    pendientes.get(a).add(b);
+  };
+  const vistos = new Set();
+  fullSchedule.forEach(([, , local, visitante]) => {
+    if (!local || !visitante) return;
+    const clave = pairKey(local, visitante);
+    if (vistos.has(clave) || existingPairs.has(clave)) return;
+    vistos.add(clave);
+    agregarPendiente(local, visitante);
+    agregarPendiente(visitante, local);
+  });
+
+  if (pendientes.size === 0) return [];
+
+  const fechas = []; // array de arrays [local, visitante]
+
+  const quedanPartidos = () => [...pendientes.values()].some((rivales) => rivales.size > 0);
+
+  while (quedanPartidos()) {
+    const usados = new Set();
+    const partidosFecha = [];
+
+    // Los equipos con más cruces pendientes entran primero a esta fecha.
+    const equipos = [...pendientes.keys()].sort(
+      (a, b) => pendientes.get(b).size - pendientes.get(a).size,
+    );
+
+    for (const equipo of equipos) {
+      if (usados.has(equipo)) continue;
+      const rivales = pendientes.get(equipo);
+      if (!rivales || rivales.size === 0) continue;
+
+      const rival = [...rivales].find((r) => !usados.has(r));
+      if (!rival) continue;
+
+      partidosFecha.push([equipo, rival]);
+      usados.add(equipo);
+      usados.add(rival);
+      pendientes.get(equipo).delete(rival);
+      pendientes.get(rival).delete(equipo);
+    }
+
+    if (partidosFecha.length === 0) break; // seguro anti-loop infinito
+    fechas.push(partidosFecha);
+  }
+
+  const start = new Date(`${startDateISO}T00:00:00`);
+  const result = [];
+  fechas.forEach((matches, idx) => {
+    const roundDate = new Date(start);
+    roundDate.setDate(start.getDate() + idx * 7);
+    const fecha = roundDate.toISOString().slice(0, 10);
+    matches.forEach(([local, visitante], i) => {
+      const hora = HORARIOS_DISPONIBLES[i % HORARIOS_DISPONIBLES.length];
+      result.push([fecha, String(jornadaOffset + idx + 1), local, visitante, hora]);
+    });
+  });
+  return result;
 }
 
 function nextSaturday() {

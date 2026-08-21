@@ -122,9 +122,10 @@ h3 {
   gap: 10px;
   color: var(--chalk);
 }
-.brand-mark {
-  color: var(--floodlight);
-  display: flex;
+.brand-logo {
+  height: 40px;
+  width: auto;
+  display: block;
 }
 .brand-text {
   font-family: var(--font-display);
@@ -280,6 +281,12 @@ h3 {
   margin: 0 auto;
   text-align: center;
 }
+.hero-logo {
+  width: min(260px, 62vw);
+  height: auto;
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.35));
+}
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -343,6 +350,37 @@ h3 {
 }
 .btn--full {
   width: 100%;
+}
+.btn--small {
+  padding: 9px 18px;
+  font-size: 13px;
+}
+.btn--outline-dark {
+  border-color: rgba(18, 35, 63, 0.35);
+  color: var(--cancha-dark);
+  background: #fff;
+}
+.btn--outline-dark:hover {
+  background: rgba(18, 35, 63, 0.06);
+}
+.btn--outline-dark:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.matches-actions {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.matches-actions-status {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
 }
 
 /* ---------- Scoreboard (elemento firma) ---------- */
@@ -525,6 +563,46 @@ h3 {
 }
 .match-panel.is-active {
   display: flex;
+}
+
+/* ---------- Partidos: filtro por jornada (solo Próximos) ---------- */
+.matches-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.matches-filter.is-hidden {
+  display: none;
+}
+.matches-filter-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.matches-filter-select {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid rgba(18, 35, 63, 0.15);
+  border-radius: 999px;
+  padding: 8px 32px 8px 14px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%2312233f'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color 0.15s ease;
+}
+.matches-filter-select:hover,
+.matches-filter-select:focus {
+  border-color: var(--cancha-dark);
+  outline: none;
 }
 .match-tentativa {
   font-family: var(--font-mono);
@@ -1006,6 +1084,11 @@ h3 {
   display: grid;
   grid-template-columns: 1.3fr 1fr 1fr;
   gap: 24px;
+}
+.footer-brand .footer-logo {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 .footer-brand p {
   margin: 10px 0 0;

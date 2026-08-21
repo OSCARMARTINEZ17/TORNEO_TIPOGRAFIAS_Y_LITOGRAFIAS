@@ -17,22 +17,11 @@
     <header class="site-header" id="top">
       <div class="header-inner">
         <a href="#top" class="brand">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 40 40" width="34" height="34">
-              <circle
-                cx="20"
-                cy="20"
-                r="18"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              />
-              <path
-                d="M20 8 L26 13 L23.5 21 L16.5 21 L14 13 Z"
-                fill="currentColor"
-              />
-            </svg>
-          </span>
+          <img
+            src="multimedia/logo.png"
+            alt="Torneo de Microfútbol · Edición Imprenta y Artes Gráficas 2026"
+            class="brand-logo"
+          />
           <span class="brand-text">TORNEO<br />GREMIAL</span>
         </a>
 
@@ -69,6 +58,11 @@
       </div>
 
       <div class="hero-content">
+        <img
+          src="multimedia/logo.png"
+          alt="Torneo de Microfútbol · Edición Imprenta y Artes Gráficas 2026"
+          class="hero-logo"
+        />
         <p class="eyebrow">
           Gremio de Tipografías y Litografías · Edición Imprenta y Artes
           Gráficas 2026
@@ -177,11 +171,32 @@
         </button>
       </div>
 
+      <div class="matches-filter" id="matches-filter-proximos">
+        <label for="filtro-fecha-proximos" class="matches-filter-label">Filtrar por fecha</label>
+        <select id="filtro-fecha-proximos" class="matches-filter-select">
+          <option value="todas">Todas las fechas</option>
+        </select>
+      </div>
+
+      <div class="matches-filter is-hidden" id="matches-filter-jugados">
+        <label for="filtro-fecha-jugados" class="matches-filter-label">Filtrar por fecha</label>
+        <select id="filtro-fecha-jugados" class="matches-filter-select">
+          <option value="todas">Todas las fechas</option>
+        </select>
+      </div>
+
       <div class="match-panel is-active" id="match-list-proximos" role="tabpanel">
         <p class="standings-loading">Cargando partidos…</p>
       </div>
       <div class="match-panel" id="match-list-jugados" role="tabpanel">
         <p class="standings-loading">Cargando partidos…</p>
+      </div>
+
+      <div class="matches-actions">
+        <button type="button" class="btn btn--outline-dark btn--small" id="btn-completar-sheet" hidden>
+          Guardar partidos faltantes en la hoja
+        </button>
+        <p class="matches-actions-status" id="completar-status"></p>
       </div>
 
       <p class="standings-meta" id="matches-meta"></p>
@@ -409,7 +424,11 @@
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <span class="brand-text">TORNEO<br />GREMIAL</span>
+          <img
+            src="multimedia/logo.png"
+            alt="Torneo de Microfútbol · Edición Imprenta y Artes Gráficas 2026"
+            class="footer-logo"
+          />
           <p>Fútbol 5 sintética · Cancha por definir</p>
         </div>
         <div class="footer-links">
