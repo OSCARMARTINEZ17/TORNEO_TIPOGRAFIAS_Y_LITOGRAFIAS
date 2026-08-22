@@ -96,7 +96,7 @@ const SHEET_ID = "16SPJe7pkLcJurVrMVFH2VMsg0gAscddnH8CGonias_g";
 const STANDINGS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Posiciones&range=N1:W18`;
 
 // Pestaña "Equipos": columnas esperadas A Equipo | B Escudo (URL de imagen).
-// Pestaña "Jugadores": columnas esperadas A Equipo | B Jugador | C Foto (URL).
+// Pestaña "Jugadores": columnas esperadas A Equipo | B Jugador | C Foto (URL) | D Número.
 // Ambas deben vivir en el mismo spreadsheet (SHEET_ID) y estar compartidas
 // como "cualquiera con el enlace puede ver".
 const TEAMS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Equipos`;
@@ -273,11 +273,16 @@ function teamCardToHtml(row, playerRows, templates) {
         .map((p) => {
           const jugador = (p[1] || "Jugador por definir").trim();
           const foto = (p[2] || "").trim();
+          const numero = (p[3] || "").trim();
           const fotoHtml = foto
             ? `<img src="${foto}" alt="${jugador}" class="player-photo" loading="lazy" />`
             : `<span class="player-photo player-photo--placeholder" aria-hidden="true">🧑</span>`;
+          const numeroHtml = numero
+            ? `<span class="player-number">${numero}</span>`
+            : "";
           return rellenarPlantilla(templates.jugador, {
             FOTO: fotoHtml,
+            NUMERO: numeroHtml,
             NOMBRE: jugador,
           });
         })
