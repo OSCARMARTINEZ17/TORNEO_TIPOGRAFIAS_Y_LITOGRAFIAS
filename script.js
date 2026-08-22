@@ -28,13 +28,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const teamNames = await initTeams(teamTemplates);
     initMatches(teamNames, proximoTemplate, jugadoTemplate);
   } catch (err) {
-    console.error("No se pudieron cargar las plantillas HTML (equipos.html, partidos_proximos.html, partidos_jugados.html). Verifica que estén en la misma carpeta que index.html y que el sitio se sirva por http/https.", err);
+    console.error(
+      "No se pudieron cargar las plantillas HTML (equipos.html, partidos_proximos.html, partidos_jugados.html). Verifica que estén en la misma carpeta que index.html y que el sitio se sirva por http/https.",
+      err,
+    );
     const teamsGrid = document.getElementById("teams-grid");
-    if (teamsGrid) teamsGrid.innerHTML = '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
+    if (teamsGrid)
+      teamsGrid.innerHTML =
+        '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
     const proximosList = document.getElementById("match-list-proximos");
     const jugadosList = document.getElementById("match-list-jugados");
-    if (proximosList) proximosList.innerHTML = '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
-    if (jugadosList) jugadosList.innerHTML = '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
+    if (proximosList)
+      proximosList.innerHTML =
+        '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
+    if (jugadosList)
+      jugadosList.innerHTML =
+        '<p class="standings-error">No se pudieron cargar las plantillas. Revisa la consola.</p>';
   }
 });
 
@@ -55,7 +64,9 @@ async function cargarPlantillaUnica(url, templateId) {
 async function fetchComoDocumento(url) {
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
-    throw new Error(`No se pudo traer "${url}" (HTTP ${response.status}). ¿Está en la misma carpeta que index.html?`);
+    throw new Error(
+      `No se pudo traer "${url}" (HTTP ${response.status}). ¿Está en la misma carpeta que index.html?`,
+    );
   }
   const html = await response.text();
   return new DOMParser().parseFromString(html, "text/html");
@@ -64,7 +75,9 @@ async function fetchComoDocumento(url) {
 function obtenerTemplate(doc, templateId, url) {
   const el = doc.getElementById(templateId);
   if (!el) {
-    throw new Error(`No se encontró el <template id="${templateId}"> dentro de "${url}".`);
+    throw new Error(
+      `No se encontró el <template id="${templateId}"> dentro de "${url}".`,
+    );
   }
   return el;
 }
@@ -369,7 +382,20 @@ const PROXIMOS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gvi
 
 // Horarios disponibles para el fixture automático: un partido por hora,
 // pensado para una sola cancha. Agrega o quita horas si usas más de una.
-const HORARIOS_DISPONIBLES = ["15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
+const HORARIOS_DISPONIBLES = [
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
+  "20:00",
+];
+
+// Si es false, el sitio NUNCA arma partidos automáticamente: "Próximos"
+// muestra únicamente lo que hayas cargado a mano en "PartidosProximos".
+// Cámbialo a true si en algún momento quieres que vuelva a completar solo
+// el "todos contra todos" con los cruces que falten.
+const AUTOCOMPLETAR_PARTIDOS = false;
 
 /* ---------- Pestañas Próximos / Jugados ---------- */
 function initMatchTabs() {
@@ -413,11 +439,22 @@ function initMatches(teamNames, proximoTemplate, jugadoTemplate) {
   if (!proximosList && !jugadosList) return;
 
   const recargar = () =>
-    loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate);
+    loadMatches(
+      proximosList,
+      jugadosList,
+      meta,
+      teamNames,
+      proximoTemplate,
+      jugadoTemplate,
+    );
 
   initCompletarBoton();
-  initFiltroFecha("filtro-fecha-proximos", () => renderProximos(proximosList, proximoTemplate));
-  initFiltroFecha("filtro-fecha-jugados", () => renderJugados(jugadosList, jugadoTemplate));
+  initFiltroFecha("filtro-fecha-proximos", () =>
+    renderProximos(proximosList, proximoTemplate),
+  );
+  initFiltroFecha("filtro-fecha-jugados", () =>
+    renderJugados(jugadosList, jugadoTemplate),
+  );
   document.addEventListener("torneo:recargar-partidos", recargar);
 
   recargar();
@@ -439,39 +476,75 @@ function initFiltroFecha(selectId, onChange) {
 // Rellena un <select> con las "Fecha N" (número de jornada) que
 // realmente existen en "rows" (cada row trae ese número en la posición
 // 1), ordenadas de menor a mayor, y respeta la que el usuario ya tenía
-// elegida si sigue existiendo.
-function poblarFiltroFecha(selectId, rows) {
+// elegida si sigue existiendo. Si "incluirHoy" es true (solo se usa para
+// Próximos) y hay al menos un partido programado para la fecha real de
+// hoy, se agrega la opción "Hoy" y queda seleccionada por defecto la
+// primera vez que se carga la página.
+function poblarFiltroFecha(selectId, rows, incluirHoy) {
   const select = document.getElementById(selectId);
   if (!select) return;
 
-  const numeros = [...new Set(
-    rows.map((row) => (row[1] || "").trim()).filter(Boolean),
-  )].sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+  const numeros = [
+    ...new Set(rows.map((row) => (row[1] || "").trim()).filter(Boolean)),
+  ].sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
 
-  const valorPrevio = select.value || "todas";
+  const hoyISO = new Date().toISOString().slice(0, 10);
+  const hayPartidosHoy =
+    incluirHoy && rows.some((row) => (row[0] || "").trim() === hoyISO);
 
-  select.innerHTML =
-    '<option value="todas">Todas las fechas</option>' +
-    numeros.map((n) => `<option value="${n}">Fecha ${n}</option>`).join("");
+  const valorPrevio = select.value; // "" en la primera carga de la página
 
-  select.value = numeros.includes(valorPrevio) ? valorPrevio : "todas";
+  let opciones = "";
+  if (hayPartidosHoy) opciones += '<option value="hoy">Hoy</option>';
+  opciones += '<option value="todas">Todas las fechas</option>';
+  opciones += numeros
+    .map((n) => `<option value="${n}">Fecha ${n}</option>`)
+    .join("");
+  select.innerHTML = opciones;
+
+  if (valorPrevio === "hoy" && hayPartidosHoy) {
+    select.value = "hoy";
+  } else if (valorPrevio === "todas" || numeros.includes(valorPrevio)) {
+    select.value = valorPrevio;
+  } else if (hayPartidosHoy) {
+    // Primera carga: si hay partidos hoy, arrancamos mostrando solo esos.
+    select.value = "hoy";
+  } else {
+    select.value = "todas";
+  }
 }
 
-// Pinta el panel de "próximos" según la Fecha (jornada) elegida en el filtro.
+// Pinta el panel de "próximos" según la Fecha (jornada) elegida en el filtro,
+// o solo los partidos de hoy si el filtro está en "hoy".
 function renderProximos(proximosList, proximoTemplate) {
   if (!proximosList) return;
 
   const select = document.getElementById("filtro-fecha-proximos");
   const filtro = select ? select.value : "todas";
+  const hoyISO = new Date().toISOString().slice(0, 10);
 
-  const filtrados =
-    filtro === "todas"
-      ? ultimosProximos
-      : ultimosProximos.filter(({ row }) => (row[1] || "").trim() === filtro);
+  let filtrados;
+  let vacioMensaje;
+  if (filtro === "hoy") {
+    filtrados = ultimosProximos.filter(
+      ({ row }) => (row[0] || "").trim() === hoyISO,
+    );
+    vacioMensaje = "No hay partidos programados para hoy.";
+  } else if (filtro === "todas") {
+    filtrados = ultimosProximos;
+    vacioMensaje = "Todavía no hay partidos programados.";
+  } else {
+    filtrados = ultimosProximos.filter(
+      ({ row }) => (row[1] || "").trim() === filtro,
+    );
+    vacioMensaje = "No hay partidos próximos en esa fecha.";
+  }
 
   proximosList.innerHTML = filtrados.length
-    ? filtrados.map(({ row, auto }) => matchProximoToHtml(row, auto, proximoTemplate)).join("")
-    : '<p class="standings-loading">No hay partidos próximos en esa fecha.</p>';
+    ? filtrados
+        .map(({ row, auto }) => matchProximoToHtml(row, auto, proximoTemplate))
+        .join("")
+    : `<p class="standings-loading">${vacioMensaje}</p>`;
 }
 
 // Pinta el panel de "jugados" según la Fecha (jornada) elegida en el filtro.
@@ -491,7 +564,14 @@ function renderJugados(jugadosList, jugadoTemplate) {
     : '<p class="standings-loading">No hay partidos jugados en esa fecha.</p>';
 }
 
-async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTemplate, jugadoTemplate) {
+async function loadMatches(
+  proximosList,
+  jugadosList,
+  meta,
+  teamNames,
+  proximoTemplate,
+  jugadoTemplate,
+) {
   try {
     const [jugadosRes, proximosRes] = await Promise.all([
       fetch(JUGADOS_CSV_URL, { cache: "no-store" }),
@@ -519,10 +599,10 @@ async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTe
     // y el sitio arma solo el resto del "todos contra todos", continuando
     // la numeración de jornada y las fechas después de tu último partido.
     let autoRows = [];
-    if (teamNames && teamNames.length >= 2) {
+    if (AUTOCOMPLETAR_PARTIDOS && teamNames && teamNames.length >= 2) {
       const existingPairs = new Set([
         ...jugadosRows.map((row) => pairKey(row[2], row[4])),
-        ...proximosRows.map((row) => pairKey(row[2], row[3])),
+        ...proximosRows.map((row) => pairKey(row[2], row[4])),
       ]);
 
       const maxJornada = Math.max(
@@ -542,7 +622,12 @@ async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTe
         startDateISO = nextSaturday();
       }
 
-      autoRows = generateMissingFixture(teamNames, existingPairs, startDateISO, maxJornada);
+      autoRows = generateMissingFixture(
+        teamNames,
+        existingPairs,
+        startDateISO,
+        maxJornada,
+      );
     }
 
     const combinedProximos = [
@@ -556,16 +641,22 @@ async function loadMatches(proximosList, jugadosList, meta, teamNames, proximoTe
       if (jugadosRows.length) {
         renderJugados(jugadosList, jugadoTemplate);
       } else {
-        jugadosList.innerHTML = '<p class="standings-loading">Todavía no se ha jugado ningún partido.</p>';
+        jugadosList.innerHTML =
+          '<p class="standings-loading">Todavía no se ha jugado ningún partido.</p>';
       }
     }
     ultimosProximos = combinedProximos;
-    poblarFiltroFecha("filtro-fecha-proximos", combinedProximos.map(({ row }) => row));
+    poblarFiltroFecha(
+      "filtro-fecha-proximos",
+      combinedProximos.map(({ row }) => row),
+      true,
+    );
     if (proximosList) {
       if (combinedProximos.length) {
         renderProximos(proximosList, proximoTemplate);
       } else {
-        proximosList.innerHTML = '<p class="standings-loading">Todavía no hay partidos programados.</p>';
+        proximosList.innerHTML =
+          '<p class="standings-loading">Todavía no hay partidos programados.</p>';
       }
     }
 
@@ -655,7 +746,8 @@ function initCompletarBoton() {
     } catch (err) {
       console.error(err);
       if (status) {
-        status.textContent = "No se pudo guardar en la hoja. Revisa la consola para más detalle.";
+        status.textContent =
+          "No se pudo guardar en la hoja. Revisa la consola para más detalle.";
       }
       btn.disabled = false;
     }
@@ -665,7 +757,8 @@ function initCompletarBoton() {
 // Fila de "PartidosJugados": Fecha | Jornada | Local | Goles Local |
 // Visitante | Goles Visitante | Hora
 function matchJugadoToHtml(row, jugadoTemplate) {
-  const [fecha, jornada, local, golesLocal, visitante, golesVisitante, hora] = row;
+  const [fecha, jornada, local, golesLocal, visitante, golesVisitante, hora] =
+    row;
   const fechaFormateada = formatMatchDate(fecha);
   const horaHtml = hora ? `<span class="match-hour">${hora}</span>` : "";
 
@@ -680,10 +773,12 @@ function matchJugadoToHtml(row, jugadoTemplate) {
   });
 }
 
-// Fila de "PartidosProximos": Fecha | Jornada | Local | Visitante | Hora
-// (sin columnas de goles, porque todavía no se ha jugado)
+// Fila de "PartidosProximos": Fecha | Jornada | Local | Goles Local |
+// Visitante | Goles Visitante | Hora  (mismo formato que PartidosJugados,
+// solo que Goles Local y Goles Visitante siempre vienen vacíos porque
+// el partido todavía no se ha jugado)
 function matchProximoToHtml(row, autoGenerado, proximoTemplate) {
-  const [fecha, jornada, local, visitante, hora] = row;
+  const [fecha, jornada, local, , visitante, , hora] = row;
   const fechaFormateada = formatMatchDate(fecha);
   const horaHtml = hora ? `<span class="match-hour">${hora}</span>` : "";
   const tentativaHtml = autoGenerado
@@ -729,7 +824,8 @@ function generateRoundRobin(teamNames, startDateISO) {
       const local = current[i];
       const visitante = current[n - 1 - i];
       if (local && visitante) {
-        const hora = HORARIOS_DISPONIBLES[horaIndex % HORARIOS_DISPONIBLES.length];
+        const hora =
+          HORARIOS_DISPONIBLES[horaIndex % HORARIOS_DISPONIBLES.length];
         schedule.push([fecha, String(round + 1), local, visitante, hora]);
         horaIndex++;
       }
@@ -784,7 +880,12 @@ function latestDate(rows, dateIndex) {
 // una heurística "voraz" (greedy) — no siempre logra el máximo teórico
 // de partidos por fecha, pero se acerca bastante más que repartir en el
 // orden en que salen.
-function generateMissingFixture(teamNames, existingPairs, startDateISO, jornadaOffset) {
+function generateMissingFixture(
+  teamNames,
+  existingPairs,
+  startDateISO,
+  jornadaOffset,
+) {
   const fullSchedule = generateRoundRobin(teamNames, startDateISO);
 
   // Grafo de partidos que faltan: equipo -> Set de rivales pendientes.
@@ -807,7 +908,8 @@ function generateMissingFixture(teamNames, existingPairs, startDateISO, jornadaO
 
   const fechas = []; // array de arrays [local, visitante]
 
-  const quedanPartidos = () => [...pendientes.values()].some((rivales) => rivales.size > 0);
+  const quedanPartidos = () =>
+    [...pendientes.values()].some((rivales) => rivales.size > 0);
 
   while (quedanPartidos()) {
     const usados = new Set();
@@ -845,7 +947,18 @@ function generateMissingFixture(teamNames, existingPairs, startDateISO, jornadaO
     const fecha = roundDate.toISOString().slice(0, 10);
     matches.forEach(([local, visitante], i) => {
       const hora = HORARIOS_DISPONIBLES[i % HORARIOS_DISPONIBLES.length];
-      result.push([fecha, String(jornadaOffset + idx + 1), local, visitante, hora]);
+      // Mismo formato de 7 columnas que PartidosProximos: Fecha | Jornada |
+      // Local | Goles Local | Visitante | Goles Visitante | Hora (los goles
+      // van vacíos porque el partido todavía no se ha jugado).
+      result.push([
+        fecha,
+        String(jornadaOffset + idx + 1),
+        local,
+        "",
+        visitante,
+        "",
+        hora,
+      ]);
     });
   });
   return result;
