@@ -453,7 +453,6 @@ function initMatches(teamNames, proximoTemplate, jugadoTemplate) {
       jugadoTemplate,
     );
 
-  initCompletarBoton();
   initFiltroFecha("filtro-fecha-proximos", () =>
     renderProximos(proximosList, proximoTemplate),
   );
@@ -673,90 +672,13 @@ async function loadMatches(
       meta.textContent = `Última actualización: ${now.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}${nota}`;
     }
 
-    ultimosFaltantes = autoRows;
-    actualizarBotonCompletar();
   } catch (err) {
     console.error(err);
     const msg =
       '<p class="standings-error">No se pudo cargar el calendario. Revisa que las hojas "PartidosJugados" y "PartidosProximos" existan y que el spreadsheet esté compartido como público.</p>';
     if (jugadosList) jugadosList.innerHTML = msg;
     if (proximosList) proximosList.innerHTML = msg;
-    ultimosFaltantes = [];
-    actualizarBotonCompletar();
   }
-}
-
-/* ---------- Guardar en la hoja los partidos que faltan por completar ----------
-   El sitio (estático) NO puede escribir directamente en Google Sheets, así
-   que este botón manda los partidos faltantes a un pequeño Web App de
-   Google Apps Script (código en el archivo apps-script-completar.gs) que
-   sí tiene permiso para agregar filas a "PartidosProximos". El propio
-   Apps Script vuelve a revisar duplicados antes de guardar, así que apretar
-   el botón varias veces es seguro. */
-const COMPLETAR_WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbxU_8_rP-7AChqHFLAvtCRZLfPlJg_vamq9EIHZhcr87poMa9lBUrnIPI8N27_75uDCDw/exec";
-
-let ultimosFaltantes = [];
-
-function actualizarBotonCompletar() {
-  const btn = document.getElementById("btn-completar-sheet");
-  const status = document.getElementById("completar-status");
-  if (!btn) return;
-
-  if (ultimosFaltantes.length === 0) {
-    btn.hidden = true;
-    if (status) status.textContent = "";
-    return;
-  }
-
-  btn.hidden = false;
-  btn.disabled = false;
-  btn.textContent = `Guardar ${ultimosFaltantes.length} partido${ultimosFaltantes.length === 1 ? "" : "s"} faltante${ultimosFaltantes.length === 1 ? "" : "s"} en la hoja`;
-}
-
-function initCompletarBoton() {
-  const btn = document.getElementById("btn-completar-sheet");
-  const status = document.getElementById("completar-status");
-  if (!btn) return;
-
-  btn.addEventListener("click", async () => {
-    if (ultimosFaltantes.length === 0) return;
-
-    if (COMPLETAR_WEBAPP_URL.includes("PEGA_AQUI")) {
-      if (status) {
-        status.textContent =
-          "Falta configurar la URL del Apps Script en script.js (constante COMPLETAR_WEBAPP_URL).";
-      }
-      return;
-    }
-
-    btn.disabled = true;
-    if (status) status.textContent = "Guardando…";
-
-    try {
-      const response = await fetch(COMPLETAR_WEBAPP_URL, {
-        method: "POST",
-        // text/plain evita el preflight CORS que Apps Script no maneja por defecto.
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ rows: ultimosFaltantes }),
-      });
-      const data = await response.json();
-      if (!data.ok) throw new Error(data.error || "Error desconocido");
-
-      if (status) {
-        status.textContent = `Listo: se guardaron ${data.agregadas} partido${data.agregadas === 1 ? "" : "s"} en la hoja.`;
-      }
-      // Recargamos el calendario para reflejar lo que ya quedó guardado.
-      document.dispatchEvent(new Event("torneo:recargar-partidos"));
-    } catch (err) {
-      console.error(err);
-      if (status) {
-        status.textContent =
-          "No se pudo guardar en la hoja. Revisa la consola para más detalle.";
-      }
-      btn.disabled = false;
-    }
-  });
 }
 
 // Fila de "PartidosJugados": Fecha | Jornada | Local | Goles Local |
